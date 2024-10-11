@@ -172,7 +172,22 @@ export class ApolloServer<
         ({ graphqlResponse, responseInit }) => {
           if (responseInit.headers) {
             for (const [name, value] of Object.entries(responseInit.headers)) {
-              res.setHeader(name, value);
+              try {
+                res.setHeader(name, value);
+              } catch(error) {
+                console.error(error);
+                console.error('setHeader failed');
+                console.error(JSON.stringify({
+                  responseInit,
+                  graphqlResponse,
+                  req: {
+                    method: req.method,
+                    query: req.query,
+                    body: req.body,
+                  }
+                }));
+                throw error;
+              }
             }
           }
           res.statusCode = responseInit.status || 200;
